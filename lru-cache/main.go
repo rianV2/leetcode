@@ -37,7 +37,7 @@ func (l *List) Remove(node *Node) {
 func (l *List) PrintAll() {
 	n := l.First()
 	for {
-		fmt.Println(n.value)
+		fmt.Printf("%d, ", n.value)
 		n = n.Next()
 		if n == nil {
 			break
@@ -46,8 +46,8 @@ func (l *List) PrintAll() {
 	fmt.Println("----")
 }
 
-func (l *List) PushHead(v int) *Node {
-	node := &Node{value: v}
+func (l *List) PushHead(k, v int) *Node {
+	node := &Node{key: k, value: v}
 
 	if l.head == nil {
 		l.head = node
@@ -64,6 +64,7 @@ func (l *List) PushHead(v int) *Node {
 
 type Node struct {
 	value int
+	key   int
 	prev  *Node
 	next  *Node
 }
@@ -107,7 +108,7 @@ func (this *LRUCache) Get(key int) int {
 	}
 
 	// push recently use to head
-	this.listData.PushHead(node.value)
+	this.listData.PushHead(node.key, node.value)
 
 	// remove node from list
 	this.listData.Remove(node)
@@ -116,19 +117,38 @@ func (this *LRUCache) Get(key int) int {
 }
 
 func (this *LRUCache) Put(key int, value int) {
-	node := this.listData.PushHead(value)
+	node := this.listData.PushHead(key, value)
 	this.keyData[key] = node
 
 	// remove last node
 	// fmt.Println(this.listData.size, "|", this.size)
 	if this.listData.size > this.size {
 		// fmt.Println("here")
-		delete(this.keyData, this.listData.Last().value)
+		delete(this.keyData, this.listData.Last().key)
 		this.listData.Remove(this.listData.Last())
 	}
 }
 
 func main() {
+	// [[2],[1,0],[2,2],[1],[3,3],[2],[4,4],[1],[3],[4]]
+
+	lRUCache := Constructor(2)
+	lRUCache.Put(1, 0)
+	lRUCache.Put(2, 2)
+	fmt.Println(lRUCache.Get(1))
+	lRUCache.listData.PrintAll()
+	lRUCache.Put(3, 3)
+	lRUCache.listData.PrintAll()
+	fmt.Println(lRUCache.Get(2))
+	lRUCache.listData.PrintAll()
+	lRUCache.Put(4, 4)
+	lRUCache.listData.PrintAll()
+	fmt.Println(lRUCache.Get(1))
+	fmt.Println(lRUCache.Get(3))
+	fmt.Println(lRUCache.Get(4))
+}
+
+func main1() {
 	lRUCache := Constructor(2)
 	lRUCache.Put(1, 1) // cache is {1=1}
 	lRUCache.Put(2, 2) // cache is {1=1, 2=2}
