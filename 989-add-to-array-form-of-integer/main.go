@@ -13,6 +13,39 @@ import (
 // num /= 10             // Remove last digit (now num = 23)
 
 func addToArrayForm(arr []int, addition int) []int {
+	var newArr []int
+	idx := len(arr) - 1
+	mem := 0
+	for {
+		// add := addition % 10
+		add := addition%10 + mem
+		if idx >= 0 {
+			add = add + arr[idx]
+		}
+		mem = add / 10 //retrieve first digit
+		if add > 9 {
+			add = add - 10 //use only value under 10
+		}
+		newArr = append([]int{add}, newArr...)
+
+		if addition/10 == 0 { //break if no more addition
+			if idx > 0 || mem != 0 {
+				if idx < 0 { //need to pass [0] for left over addition
+					idx = 0
+				}
+				newArr = append(addToArrayForm(arr[0:idx], mem), newArr...) //add left over addition
+			}
+			break
+		}
+		idx -= 1
+		addition /= 10
+
+	}
+
+	return newArr
+}
+
+func addToArrayForm1(arr []int, addition int) []int {
 	mem := 0
 	for i := len(arr) - 1; i >= 0; i-- {
 		add := addition % 10
@@ -53,8 +86,11 @@ func main() {
 		expected Expect
 	}{
 		{"Case 1", Input{[]int{2, 7, 4}, 181}, Expect{4, 5, 5}},
-		{"Case 1", Input{[]int{0}, 23}, Expect{2, 3}},
-		{"Case 1", Input{[]int{0}, 10000}, Expect{1, 0, 0, 0, 0}},
+		{"Case 2", Input{[]int{0}, 23}, Expect{2, 3}},
+		{"Case 3", Input{[]int{0}, 10000}, Expect{1, 0, 0, 0, 0}},
+		{"Case 4", Input{[]int{1}, 99}, Expect{1, 0, 0}},
+		{"Case 4", Input{[]int{1, 2, 0, 0}, 34}, Expect{1, 2, 3, 4}},
+		{"Case 4", Input{[]int{1, 2, 3}, 9}, Expect{1, 3, 2}},
 	}
 
 	for _, tt := range tests {
