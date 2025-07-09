@@ -1,6 +1,8 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+)
 
 /**
  * Definition for a binary tree node.
@@ -75,6 +77,11 @@ func NewTreeFromArray(inp []int) *TreeNode {
 	return root
 }
 
+/*
+History
+ 1. add to array current val only, not his left and right directly
+    they will be added at next queue scan
+*/
 func levelOrder(root *TreeNode) [][]int {
 	if root == nil {
 		return [][]int{}
@@ -83,37 +90,48 @@ func levelOrder(root *TreeNode) [][]int {
 	var result [][]int
 
 	queue = append(queue, root)
-	result = append(result, []int{root.Val})
+	// result = append(result, []int{root.Val}) //removed since, we scan it from queue
 
-	required := 2
-	scan := 1
+	// required := 2
+	// scan := 1 //had scan the root
 
-	var arr []int
-	for len(queue) != 0 {
-		node := queue[0]
-		queue = queue[1:]
-		if node.Left != nil {
-			arr = append(arr, node.Left.Val)
-			queue = append(queue, node.Left)
+	for len(queue) > 0 { //O(n)
+		currentQSize := len(queue)
+		var arr []int
+
+		/* scan current size queue first
+		while scanning current queue size, it will only add new queue
+		without executing it directly
+		*/
+		for i := 0; i < currentQSize; i++ { //O(n) constant factor cause depend on populated data (qeueu)
+			node := queue[0]
+			queue = queue[1:]
+			arr = append(arr, node.Val)
+
+			if node.Left != nil {
+				queue = append(queue, node.Left)
+			}
+			if node.Right != nil {
+				queue = append(queue, node.Right)
+			}
 		}
-		if node.Right != nil {
-			arr = append(arr, node.Right.Val)
-			queue = append(queue, node.Right)
-		}
-		scan++
-		if len(arr) != 0 && scan == required {
-			result = append(result, arr)
-			required = required * 2
-			arr = []int{}
-		}
+		result = append(result, arr)
 	}
+
+	/*
+		Time Complexity: O(n)
+		Space Complexity: O(w)
+			- queue added, and removed
+			- this will depend on the longest size of a level
+	*/
 
 	return result
 }
 
 func main() {
-	// root := []int{3, 9, 20, -1, -1, 15, 7}
-	root := []int{1, 2, 3, 4, -1, -1, 5, 1, 1, 1, 1, 1, 1}
+	//incomplete binary tree, left side only
+	root := []int{1, 2, -1, 3, -1, 4, -1, 5}
+
 	fmt.Println(root)
 	rootTree := NewTreeFromArray(root)
 	fmt.Println("---print---")
